@@ -6,17 +6,17 @@ public class Homer : MonoBehaviour
 {
     #region Member Variables
 
-    [Header("H.O.M.E.R. Components")] 
+    [Header("H.O.M.E.R. Components")]
     public Transform head;
     public float originHeadOffset = 0.2f;
     public Transform hand;
 
-    [Header("H.O.M.E.R. Parameters")] 
+    [Header("H.O.M.E.R. Parameters")]
     public LineRenderer ray;
     public float rayMaxLength = 100f;
     public LayerMask layerMask;
-    
-    [Header("Input Actions")] 
+
+    [Header("Input Actions")]
     public InputActionProperty grabAction;
 
     [Header("Grab Configuration")]
@@ -34,12 +34,12 @@ public class Homer : MonoBehaviour
             return false;
         }
     }
-    
+
     // variables needed for hand offset calculation
     private RaycastHit hit;
     private float grabOffsetDistance;
     private float grabHandDistance;
-    
+
     // convenience variables for hand offset calculations
     private Vector3 origin
     {
@@ -63,7 +63,7 @@ public class Homer : MonoBehaviour
 
     private void Start()
     {
-        if(GetComponentInParent<NetworkObject>() != null)
+        if (GetComponentInParent<NetworkObject>() != null)
             if (!GetComponentInParent<NetworkObject>().IsOwner)
             {
                 Destroy(this);
@@ -93,7 +93,7 @@ public class Homer : MonoBehaviour
         {
             ray.SetPosition(0, origin);
             ray.SetPosition(1, hit.point);
-            
+
             ray.startColor = Color.green;
             ray.endColor = Color.green;
 
@@ -103,7 +103,7 @@ public class Homer : MonoBehaviour
         {
             ray.SetPosition(0, origin);
             ray.SetPosition(1, hand.position + direction.normalized * rayMaxLength);
-            
+
             ray.startColor = Color.red;
             ray.endColor = Color.red;
 
@@ -115,7 +115,7 @@ public class Homer : MonoBehaviour
     {
         float offsetFactor = Vector3.Distance(origin, hand.position) / grabHandDistance;
         float offsetDistance = grabOffsetDistance * offsetFactor;
-        
+
         transform.position = origin + direction.normalized * offsetDistance;
         transform.rotation = hand.rotation;
     }
@@ -129,7 +129,7 @@ public class Homer : MonoBehaviour
                 grabbedObject = handCollider.collidingObject;
                 offsetMatrix = GetTransformationMatrix(handCollider.transform, true).inverse *
                                GetTransformationMatrix(grabbedObject.transform, true);
-                
+
                 grabOffsetDistance = Vector3.Distance(origin, hit.point);
                 grabHandDistance = Vector3.Distance(origin, hand.position);
 
@@ -149,18 +149,18 @@ public class Homer : MonoBehaviour
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
-            if(grabbedObject != null)
+            if (grabbedObject != null)
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
             grabbedObject = null;
             offsetMatrix = Matrix4x4.identity;
-            
+
             transform.localPosition = Vector3.zero;
             ray.enabled = true;
         }
     }
 
     #endregion
-    
+
     #region Utility Functions
 
     public Matrix4x4 GetTransformationMatrix(Transform t, bool inWorldSpace = true)
